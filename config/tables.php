@@ -1,5 +1,5 @@
 <?php 
-include_once 'Database.php';
+include_once 'db.php';
 require_once 'constant.php';
 
 $conn = dbconnect();
@@ -121,4 +121,22 @@ $sql = "CREATE TABLE IF NOT EXISTS stock (
     FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 )";
 $conn->exec($sql);
+
+// $password = 'admin123'; 
+// $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+// $sql = "INSERT INTO users (firstname, lastname, email, password, role, phone, created_at) 
+// VALUES (
+//     'Admin', 
+//     'User', 
+//     'admin@sastobazaar.com', 
+//     '$hashedPassword', 
+//     'admin', 
+//     '1234567890', 
+//     NOW()
+// )";
+
+//     $conn->exec($sql);
+
 ?>
+

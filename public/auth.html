@@ -7,7 +7,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-  <!-- Vue 3 + Axios CDN -->
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
@@ -77,11 +76,10 @@
               </form>
             </div>
 
-            <!-- SIGNUP FORM -->
             <div class="w-full flex-shrink-0 space-y-6">
               <div class="text-center">
                 <h1 class="text-4xl font-bold text-green-600">Create Account</h1>
-                <p class="text-gray-600 mt-3 text-lg">Join thousands of happy customers</p>
+                <p class="text-gray-600 mt-3 text-lg">Create Sasto Bazaar account and enjoy </p>
               </div>
 
               <form @submit.prevent="register" class="space-y-5">
@@ -206,7 +204,7 @@ createApp({
         const res = await axios.post('api/login.php', login);
         if (res.data.success) {
           showToast('Login successful!', 'success');
-          setTimeout(() => window.location = res.data.role === 'admin' ? 'admin/dashboard.php' : 'index.html', 1000);
+          setTimeout(() => window.location = res.data.role === 'admin' ? '../admin/dashboard.php' : 'index.php', 1500);
         } else {
           showToast(res.data.message || 'Invalid credentials', 'error');
         }
@@ -217,31 +215,40 @@ createApp({
       }
     };
 
-    // Register
-    const register = async () => {
-      clearErrors();
-      validateSignupField();
-      if (Object.values(errors).some(e => e)) {
-        showToast('Please fix the errors', 'error');
-        return;
-      }
+  const register = async () => {
+  clearErrors();
+  validateSignupField();
+  if (Object.values(errors).some(e => e)) {
+    showToast('Please fix the errors', 'error');
+    return;
+  }
 
-      loading.value = true;
-      try {
-        const res = await axios.post('api/register.php', { ...signup, role: 'customer' });
-        if (res.data.success) {
-          showToast('Account created! Please login', 'success');
-          isLogin.value = true;
-          Object.assign(signup, { firstname: '', lastname: '', email: '', phone: '', password: '' });
-        } else {
-          showToast(res.data.message || 'Email already exists', 'error');
-        }
-      } catch (err) {
-        showToast(err.response?.data?.message || 'Registration failed', 'error');
-      } finally {
-        loading.value = false;
-      }
-    };
+  loading.value = true;
+  try {
+    const res = await axios.post('api/register.php', { 
+      ...signup, 
+      role: 'customer' 
+    });
+    
+    if (res.data.success) {
+      showToast('Account created! Please login', 'success');
+      isLogin.value = true;
+      Object.assign(signup, { 
+        firstname: '', 
+        lastname: '', 
+        email: '', 
+        phone: '', 
+        password: '' 
+      });
+    } else {
+      showToast(res.data.message || 'Registration failed', 'error');
+    }
+  } catch (err) {
+    showToast(err.response?.data?.message || 'Registration failed. Please try again.', 'error');
+  } finally {
+    loading.value = false;
+  }
+};
 
     return {
       isLogin, loading, login, signup, errors, toast,

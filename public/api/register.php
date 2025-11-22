@@ -1,29 +1,72 @@
 <?php
-require_once '../Database.php';
+require_once '../../config/db.php';
 $conn = dbconnect();
 
 header('Content-Type: application/json');
 
-$firstname = trim($_POST['firstname']);
-$lastname = trim($_POST['lastname']);
-$email = trim($_POST['email']);
-$phone = $_POST['phone'] ?? null;
-$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-$role = 'customer'; // only allow customer signup
+$input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 
-if (!$firstname || !$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(['success' => false, 'message' => 'Invalid data']);
+$firstname = trim($input['firstname'] ?? '');
+$lastname = trim($input['lastname'] ?? '');
+$email = trim($input['email'] ?? '');
+$phone = $input['phone'] ?? null;
+$password = $input['password'] ?? '';
+$role = 'customer'; 
+
+$errors = [];
+
+if (empty($firstname)) {
+    $errors[] = 'First name is required';
+}
+
+if (empty($email)) {
+    $errors[] = 'Email is required';
+} elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $errors[] = 'Invalid email format';
+}
+
+if (empty($password)) {
+    $errors[] = 'Password is required';
+} elseif (strlen($password) < 6) {
+    $errors[] = 'Password must be at least 6 characters';
+}
+
+if (!empty($errors)) {
+    echo json_encode([
+        'success' => false, 
+        'message' => implode(', ', $errors)
+    ]);
     exit;
 }
 
 try {
-    $stmt = $conn->prepare("INSERT INTO users (firstname, lastname, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$firstname, $lastname, $email, $phone, $password, $role]);
-    echo json_encode(['success' => true]);
-} catch(PDOException $e) {
-    if ($e->getCode() == 23000) {
-        echo json_encode(['success' => false, 'message' => 'Email already registered']);
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Database error']);
+    // Check if email already exists
+    $checkStmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+    $checkStmt->execute([$email]);
+    
+    if ($checkStmt->fetch()) {
+        echo json_encode([
+            'success' => false, 
+            'message' => 'Email already registered'
+        ]);
+        exit;
     }
+
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    $stmt = $conn->prepare("INSERT INTO users (firstname, lastname, email, phone, password, role) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$firstname, $lastname, $email, $phone, $hashedPassword, $role]);
+    
+    echo json_encode([
+        'success' => true, 
+        'message' => 'Account created successfully'
+    ]);
+    
+} catch(PDOException $e) {
+    error_log("Registration error: " . $e->getMessage());
+    echo json_encode([
+        'success' => false, 
+        'message' => 'Registration failed. Please try again.'
+    ]);
 }
+?>

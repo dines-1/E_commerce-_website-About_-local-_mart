@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'db.php'; // your PDO connection
+require_once '../../config/db.php'; // your PDO connection
 
 header('Content-Type: application/json');
 
@@ -21,7 +21,12 @@ try {
             $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode($products);
             break;
-
+         case 'get_one':
+            $id = (int)$_GET['id'];
+            $stmt = $conn->prepare("SELECT p.*, c.category_name FROM products p LEFT JOIN categories c ON p.category_id = c.id WHERE p.id = ?");
+            $stmt->execute([$id]);
+            echo json_encode($stmt->fetch(PDO::FETCH_ASSOC));
+    break;
         case 'create':
         case 'update':
             $name = trim($_POST['product_name']);
@@ -62,6 +67,7 @@ try {
 
             echo json_encode(['success' => true]);
             break;
+          
 
         case 'delete':
             $id = (int)$_POST['id'];
