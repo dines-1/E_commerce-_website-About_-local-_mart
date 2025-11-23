@@ -25,7 +25,6 @@ try {
             
             $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
             
-            // Convert image paths to full URLs
             foreach ($categories as &$category) {
                 if (!empty($category['image_url']) && !filter_var($category['image_url'], FILTER_VALIDATE_URL)) {
                     $category['image_url'] = getFullImageUrl($category['image_url']);
@@ -56,7 +55,6 @@ try {
                 throw new Exception('Category name is required');
             }
 
-            // Handle file upload
             $image_url = '';
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
                 $image_url = uploadImage($_FILES['image']);
@@ -67,7 +65,6 @@ try {
             
             $category_id = $conn->lastInsertId();
             
-            // Get the created category with full image URL
             $stmt = $conn->prepare("SELECT * FROM categories WHERE id = ?");
             $stmt->execute([$category_id]);
             $category = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -92,16 +89,13 @@ try {
                 throw new Exception('Category name is required');
             }
 
-            // Get current category data
             $stmt = $conn->prepare("SELECT image_url FROM categories WHERE id = ?");
             $stmt->execute([$id]);
             $current_category = $stmt->fetch(PDO::FETCH_ASSOC);
             
             $image_url = $current_category['image_url'] ?? '';
 
-            // Handle file upload if new image is provided
             if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-                // Delete old image if exists
                 if (!empty($image_url)) {
                     deleteImage($image_url);
                 }
@@ -111,7 +105,6 @@ try {
             $stmt = $conn->prepare("UPDATE categories SET category_name = ?, image_url = ?, display_order = ? WHERE id = ?");
             $stmt->execute([$category_name, $image_url, $display_order, $id]);
             
-            // Get the updated category with full image URL
             $stmt = $conn->prepare("SELECT * FROM categories WHERE id = ?");
             $stmt->execute([$id]);
             $category = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -130,7 +123,6 @@ try {
         case 'delete':
             $id = intval($_POST['id']);
             
-            // Check if category has products
             $stmt = $conn->prepare("SELECT COUNT(*) FROM products WHERE category_id = ?");
             $stmt->execute([$id]);
             $productCount = $stmt->fetchColumn();
@@ -140,16 +132,13 @@ try {
                 exit;
             }
 
-            // Get category image before deletion
             $stmt = $conn->prepare("SELECT image_url FROM categories WHERE id = ?");
             $stmt->execute([$id]);
             $category = $stmt->fetch(PDO::FETCH_ASSOC);
             
-            // Delete category
             $stmt = $conn->prepare("DELETE FROM categories WHERE id = ?");
             $stmt->execute([$id]);
             
-            // Delete associated image
             if ($category && !empty($category['image_url'])) {
                 deleteImage($category['image_url']);
             }
@@ -165,14 +154,12 @@ try {
 }
 
 function uploadImage($file) {
-    $uploadDir = '../uploads/categories/';
+    $uploadDir = '../../uploads/category/';
     
-    // Create directory if it doesn't exist
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0755, true);
     }
     
-    // Validate file type
     $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     $fileType = mime_content_type($file['tmp_name']);
     
@@ -180,18 +167,16 @@ function uploadImage($file) {
         throw new Exception('Invalid file type. Only JPEG, PNG, GIF, and WebP images are allowed.');
     }
     
-    // Validate file size (max 5MB)
     if ($file['size'] > 5 * 1024 * 1024) {
         throw new Exception('File size too large. Maximum size is 5MB.');
     }
     
-    // Generate unique filename
     $fileExtension = pathinfo($file['name'], PATHINFO_EXTENSION);
     $fileName = uniqid() . '_' . time() . '.' . $fileExtension;
     $filePath = $uploadDir . $fileName;
     
     if (move_uploaded_file($file['tmp_name'], $filePath)) {
-        return 'uploads/categories/' . $fileName; // Return relative path
+        return 'uploads/category/' . $fileName; // Return relative path
     } else {
         throw new Exception('Failed to upload image');
     }

@@ -23,6 +23,9 @@
     <a href="users.php"        class="menu-item flex items-center px-6 py-4 text-lg transition hover:bg-gray-800">
       <i class="fas fa-users mr-4"></i> Customers
     </a>
+     <a href="inventory.php"        class="menu-item flex items-center px-6 py-4 text-lg transition hover:bg-gray-800">
+      <i class="fas fa-users mr-4"></i> Inventory
+    </a>
     <a href="setting.php"      class="menu-item flex items-center px-6 py-4 text-lg transition hover:bg-gray-800">
       <i class="fas fa-cog mr-4"></i> Settings
     </a>

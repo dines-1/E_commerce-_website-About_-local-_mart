@@ -2,7 +2,6 @@
 <?php include 'includes/navbar.php'; ?>
 
 <div id="app">
-  <!-- Hero Section -->
   <section class="relative h-screen bg-cover bg-center" style="background-image: url('assets/hero-market.jpg')">
     <div class="absolute inset-0 bg-black/50"></div>
     <div class="relative max-w-7xl mx-auto px-4 h-full flex items-center text-white">
@@ -15,7 +14,6 @@
     </div>
   </section>
 
-  <!-- Categories -->
   <section id="categories" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4">
       <h2 class="text-4xl font-bold text-center mb-12">Shop by Category</h2>
@@ -31,7 +29,6 @@
     </div>
   </section>
 
-  <!-- Featured Products -->
   <section id="products" class="py-16 bg-gray-100">
     <div class="max-w-7xl mx-auto px-4">
       <h2 class="text-4xl font-bold text-center mb-12">Featured Products</h2>
@@ -62,7 +59,6 @@
     </div>
   </section>
 
-  <!-- About Section -->
   <section id="about" class="py-16 bg-white">
     <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
       <div>

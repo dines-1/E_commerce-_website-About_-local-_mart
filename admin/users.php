@@ -214,8 +214,8 @@ document.getElementById('password-form').onsubmit = async function(e) {
       alert('Passwords do not match!');
       return;
     }
-    if (newPass.length < 6) {
-      alert('Password must be at least 6 characters long!');
+    if (newPass.length < 8) {
+      alert('Password must be at least 8 characters long!');
       return;
     }
     await axios.post('includes/users.php', {
